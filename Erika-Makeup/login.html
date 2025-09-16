@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="assets/login.css" />
+    <title>Agendar | Erika Silva Makeup</title>
+  </head>
+  <body>
+    <nav class="menu">
+      <a href="index.html" class="menu__logo">
+        <img
+          src="assets/images/logo sem fundo.png"
+          alt="Logotipo Erika"
+          class="menu__logo-image"
+        />
+      </a>
+    </nav>
+    <main class="content">
+      <!-- adicionei id no form -->
+      <form class="login container" id="agendamentoForm">
+        <h1 class="login__title">Marque seu horario</h1>
+        <input
+          class="login__field"
+          type="text"
+          name="nome"
+          id="nome"
+          placeholder="Nome"
+          required
+        />
+        <input
+          class="login__field"
+          type="tel"
+          name="contato"
+          id="contato"
+          placeholder="Telefone (xx) x xxxx-xxxx"
+          minlength="18"
+          required
+        />
+        <input class="login__field" type="date" id="data" required />
+
+        <select class="login__field" id="hora" required>
+          <option value="">Selecione um horário</option>
+          <option>08:00</option>
+          <option>09:30</option>
+          <option>11:00</option>
+          <option>12:30</option>
+          <option>14:00</option>
+          <option>15:30</option>
+          <option>17:00</option>
+          <option>18:30</option>
+        </select>
+
+        <div class="login__actions">
+          <button type="submit" class="button button--gradient">Agendar</button>
+        </div>
+        <p id="mensagem"></p>
+      </form>
+    </main>
+
+    <footer class="footer container">
+      <div>
+        <a class="footer__link" href="https://www.instagram.com/erika__makeup/">
+          @erika__makeup
+        </a>
+      </div>
+      <p class="text--small footer__legal">
+        Santo Antônio do descoberto - Goiás
+      </p>
+      <div class="footer__social">
+        <a
+          href="https://www.instagram.com/erika__makeup/"
+          class="footer__social-link"
+        >
+          <img src="assets/images/instagram_0.png" alt="Instagram" />
+        </a>
+      </div>
+    </footer>
+    <script>
+      const horariosOcupados = []; // guarda os horários já agendados
+
+      document
+        .getElementById("agendamentoForm")
+        .addEventListener("submit", function (e) {
+          e.preventDefault();
+
+          const nome = document.getElementById("nome").value;
+          const telefone = document.getElementById("contato").value;
+          const dataSel = document.getElementById("data").value;
+          const horaSel = document.getElementById("hora").value;
+
+          // verifica se já tem agendamento nesse dia/hora
+          const chave = dataSel + " " + horaSel;
+          if (horariosOcupados.includes(chave)) {
+            document.getElementById("mensagem").innerText =
+              "❌ Este horário já está ocupado!";
+            return;
+          }
+
+          const data = {
+            nome: nome,
+            telefone: telefone,
+            data: dataSel,
+            hora: horaSel,
+          };
+
+          fetch(
+            "https://script.google.com/macros/s/AKfycbyoX6em4kRJ1MDNAfAz-lkjrDZ26zuXzOCl-IBPVEkdBNjRwTH5gLm-lO1A5xvR6Z73/exec",
+            {
+              method: "POST",
+              body: JSON.stringify(data),
+            }
+          )
+            .then((res) => res.text())
+            .then((msg) => {
+              document.getElementById("mensagem").innerText =
+                "✅ Agendamento Confirmado!!";
+
+              horariosOcupados.push(chave); // marca o horário como ocupado
+              document.getElementById("agendamentoForm").reset();
+            })
+            .catch((err) => {
+              document.getElementById("mensagem").innerText =
+                "Erro ao agendar!";
+            });
+        });
+    </script>
+  </body>
+</html>
